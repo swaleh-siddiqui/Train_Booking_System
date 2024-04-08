@@ -1,0 +1,28 @@
+<% layout("/layouts/boilerplate") %>
+
+<body>
+  <div class="container py-5">
+    <h1>Train Search Results</h1>
+    <p>We found the following trains matching your search criteria:</p>
+    <div class="row">
+        <% for (let i = 0; i < 7; i++){ %>
+        <div class="col-md-6 mb-3">
+            <div class="card shadow" >
+              <div class="card-body">
+                <h5 class="card-title">Train Name: Express 1234</h5>
+                <p class="card-text">
+                  From: <%= from %> (NYC) - To: <%= to %> (LAX)<br>
+                  Departure: <%= date %><br>
+                  Duration: 48h<br>
+                  Starting Price: $250
+                </p>
+                <a href="#" class="btn btn-outline-dark">Select Seats</a>
+              </div>
+            </div>
+          </div>
+        <% } %>
+
+      </div>
+  </div>
+
+</body>
