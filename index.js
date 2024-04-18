@@ -111,15 +111,15 @@ app.use("/train" , trains);
 
 // error handling
 
-// app.all("*" , (req,res,next) => {
-//     next(new ExpressError(404, "page not found"));
-// })
+app.all("*" , (req,res,next) => {
+    next(new ExpressError(404, "page not found"));
+})
 
-// app.use((err, req , res, next) => {
-//     let {statusCode = 500 , message = "Sometghing went wrong"} = err;
-//     // res.status(statusCode).send(message);
-//     res.render("error.ejs" , {statusCode, message});
-// })
+app.use((err, req , res, next) => {
+    let {statusCode = 500 , message = "Sometghing went wrong"} = err;
+    // res.status(statusCode).send(message);
+    res.render("error.ejs" , {statusCode, message});
+})
 
 
 // server stqrt

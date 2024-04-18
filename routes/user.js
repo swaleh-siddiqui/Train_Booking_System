@@ -5,7 +5,8 @@ const User = require("../models/user.js")
 const wrapAsync = require("../utils/wrapasync.js")
 const ExpressError = require("../utils/expresserror.js");
 const passport = require("passport");
-const { saveRedirectUrl } = require("../middlewares.js");
+const { saveRedirectUrl, isLoggedIn } = require("../middlewares.js");
+const Booking = require("../models/booking.js");
 
 
 
@@ -73,6 +74,15 @@ router.get("/user_logout", (req,res, next) => {
         req.flash("success" , "Goodbye user");
         res.redirect("/");
     })
+})
+
+
+
+// user booking history route
+
+router.get("/history", isLoggedIn , async (req,res) => {
+    let bookings = await Booking.find({owner : req.user._id});
+    res.render("./users/history.ejs", {bookings});
 })
 
 module.exports = router;
