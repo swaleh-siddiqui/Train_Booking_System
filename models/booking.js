@@ -12,6 +12,8 @@ const bookingSchema = new Schema({
     train_date: String,
     class_type: String,
     duration : String,
+    fare : Number,
+    total : Number,
     owner:{
         type : Schema.Types.ObjectId,
         ref : "User"

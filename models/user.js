@@ -8,6 +8,10 @@ const userSchema = new Schema({
       type : String,
       required : true
     },
+    age : {
+        type : Number,
+        required : true
+    },
     first_name:{
         type : String,
         required : true

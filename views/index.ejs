@@ -69,11 +69,21 @@
         <form class="search-form" action="/train/search_train" method="get">
           <div class="mb-3">
             <label for="from" class="form-label">From:</label>
-            <input type="text" class="form-control" id="from" placeholder="Enter Origin City" name="from" required>
+            <input type="text" class="form-control" id="from" placeholder="Enter Origin City" list="programmingLanguages" name="from" required>
+            <datalist id="programmingLanguages">
+              <% for (let sta of station){%>
+              <option value="<%= sta.stnCode %>"><%= sta.stnName %></option>
+              <% } %>
+            </datalist>
           </div>
           <div class="mb-3">
             <label for="to" class="form-label">To:</label>
-            <input type="text" class="form-control" id="to" placeholder="Enter Destination City" name="to" required>
+            <input type="text" class="form-control" id="to" placeholder="Enter Destination City" list="programmingLanguages" name="to" required>
+            <datalist id="programmingLanguages">
+              <% for (let sta of station){%>
+              <option value="<%= sta.stnCode %>"><%= sta.stnName %></option>
+              <% } %>
+            </datalist>
           </div>
           <div class="mb-3">
             <label for="date" class="form-label">Departure Date:</label>

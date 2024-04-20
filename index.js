@@ -12,6 +12,10 @@ const flash = require("connect-flash");
 
 const User = require("./models/user.js");
 
+// api station code and name import 
+
+const stations = require("./train_api/stations.js");
+
 // require error modules
 
 const wrapAsync = require("./utils/wrapasync.js");
@@ -96,7 +100,8 @@ async function main() {
 // home route
 
 app.get("/", (req,res) => {
-    res.render("index.ejs");
+    let station = stations;
+    res.render("index.ejs" , {station});
 })
 
 

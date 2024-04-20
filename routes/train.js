@@ -12,16 +12,18 @@ const {isLoggedIn} = require("../middlewares.js");
 
 
 
+const stationTypeA  =  require('../train_api/categoryAstations.js');
+const stationTypeB  =  require('../train_api/categoryBstations.js');
+const stationTypeC  =  require( '../train_api/categoryCstations.js');
+const stationTypeD  = require('../train_api/categoryDstations.js');
+const stationTypeA1  = require('../train_api/categoryA1stations.js');
+const stations = require("../train_api/stations.js");
 
 
-const axios = require('axios');
+// api call import 
 
+const train_api_irctc_call = require("../apis.js");
 
-const  stationTypeA  =  require('../train_api/categoryAstations.js');
-const  stationTypeB  =  require('../train_api/categoryBstations.js');
-const  stationTypeC  =  require( '../train_api/categoryCstations.js');
-const  stationTypeD  = require('../train_api/categoryDstations.js');
-const  stationTypeA1  = require('../train_api/categoryA1stations.js');
 
 
 
@@ -29,7 +31,8 @@ const  stationTypeA1  = require('../train_api/categoryA1stations.js');
 // train home route
 
 router.get("", isLoggedIn,  wrapAsync(async (req,res) => {
-    res.render("./train/home.ejs")
+    let station = stations;
+    res.render("./train/home.ejs" , {station})
 }))
 
 
@@ -37,14 +40,18 @@ router.get("", isLoggedIn,  wrapAsync(async (req,res) => {
 // search train route
 
 router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
-    // let from = req.query.from;
-    // let to = req.query.to;
-    // let date = req.query.date;
     
     const {query} = req;
-    const startStation = query.from;
-    const endStation = query.to;
+    const startStationCode = query.from;
+    const endStationCode = query.to;
     const date = query.date;
+
+    let st = {};
+    for (let s of stations){
+        st[s.stnCode] = s.stnCity;
+    }
+    let startStation = st[startStationCode];
+    let endStation = st[endStationCode];
 
     let startInd=-1;
     let endInd = -1;
@@ -242,17 +249,17 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         return d1-d2;
     });
 
+    // train api call 
 
-
-    // let trains = [1,2,3, 4, 5,6,7,]
     let trains = await Train.find();
+    // let trains = await train_api_irctc_call(startStationCode, endStationCode, date);
 
-// train api call 
+
 
 
     res.status(200).send({"StationNearStart":stationNearStart,"StationNearEnd":stationNearEnd});
 
-    console.log(stationNearStart);
+    // console.log(stationNearStart);
 
 
 
@@ -264,6 +271,21 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
 
 
 // train booking route post
+
+router.post("/booking" , (req,res) => {
+    let train = req.body.ob;
+    console.log(train);
+
+    let price = {
+        "3A" : 1200,
+        "2A" : 1500,
+        "1A" : 2100,
+        "SL" : 700,
+        "3E" : 1300,
+    }
+
+    res.render("./train/booking.ejs", {train , price});
+})
 
 router.post("/book" , isLoggedIn, wrapAsync(async (req,res) => {
     let booking = new Booking(req.body.ob);

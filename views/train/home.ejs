@@ -67,6 +67,37 @@
         font-size: 1rem;
         text-align: left !important;
     }
+    .inprow{
+  position: relative;
+  }
+
+  .dropdownitems {
+    padding: 0;
+    margin: 0;
+    z-index: 5;
+    list-style: none;
+    position: absolute;
+    left: 0%;
+    width: 100%;
+    max-height:25vh;
+    overflow:auto;
+    background-color: #2f3238;
+  }
+  .dropdownitems li {
+    color: white;
+    background: #2f3238;
+    border-radius: 0.5em;
+  }
+    .dropdownitems li:hover {
+    background: #1d1f24;
+  }
+  .dropdownitems li a {
+    display: block;
+    padding: 0.7em ;
+    color: #fff;
+    margin:0;
+    text-decoration: none;
+  }
   </style>
 
 <body>
@@ -87,14 +118,24 @@
       </div>
       <div class="col-md-4">
         <h2>Search Trains</h2>
-        <form class="search-form" action="/train/search_train" method="get">
-          <div class="mb-3">
+        <form class="search-form" action="/train/search_train" method="get" autocomplete="off">
+          <div class="mb-3 inprow" >
             <label for="from" class="form-label">From:</label>
-            <input type="text" class="form-control" id="from" placeholder="Enter Origin City" name="from" required>
+            <input type="text" class="form-control" id="from" placeholder="Enter Origin City" name="from" list="programmingLanguages" required>
+            <datalist id="programmingLanguages">
+              <% for (let sta of station){%>
+              <option value="<%= sta.stnCode %>"><%= sta.stnName %></option>
+              <% } %>
+            </datalist>
           </div>
           <div class="mb-3">
             <label for="to" class="form-label">To:</label>
-            <input type="text" class="form-control" id="to" placeholder="Enter Destination City" name="to" required>
+            <input type="text" class="form-control" id="to" placeholder="Enter Destination City" list="programmingLanguages" name="to" required>
+            <datalist id="programmingLanguages">
+              <% for (let sta of station){%>
+              <option value="<%= sta.stnCode %>"><%= sta.stnName %></option>
+              <% } %>
+            </datalist>
           </div>
           <div class="mb-3">
             <label for="date" class="form-label">Departure Date:</label>
@@ -111,5 +152,21 @@
       </div>
     </div>
   </div>
+
+
+
+  <script>
+
+  let inp = document.querySelector("#list");
+  let list = document.querySelector("#allItems0");
+  if (inp.value == ""){
+    list.style.display = "none"
+  }
+  else{
+    list.style.display = "list-item";
+  }
+
+  </script>
+
 
 </body>

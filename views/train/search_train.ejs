@@ -40,7 +40,7 @@
                 </p>
                 <div class="class">
                   <% for (let clas of train.class_type){ %>
-                    <form class="p-0 m-0" action="/train/book" method="post">
+                    <form class="p-0 m-0" action="/train/booking" method="post">
                       <input type="text" name="ob[train_number]" value="<%= train.train_number %>">
                       <input type="text" name="ob[train_name]" value="<%= train.train_name %>">
                       <input type="text" name="ob[from_std]" value="<%= train.from_std %>">
