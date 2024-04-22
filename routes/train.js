@@ -23,36 +23,10 @@ const stations = require("../train_api/stations.js");
 // api call import 
 
 const train_api_irctc_call = require("../apis.js");
+const wrapasync = require("../utils/wrapasync.js");
 
 
-
-
-
-// train home route
-
-router.get("", isLoggedIn,  wrapAsync(async (req,res) => {
-    let station = stations;
-    res.render("./train/home.ejs" , {station})
-}))
-
-
-
-// search train route
-
-router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
-    
-    const {query} = req;
-    const startStationCode = query.from;
-    const endStationCode = query.to;
-    const date = query.date;
-
-    let st = {};
-    for (let s of stations){
-        st[s.stnCode] = s.stnCity;
-    }
-    let startStation = st[startStationCode];
-    let endStation = st[endStationCode];
-
+let alternating = (startStation, endStation) => {
     let startInd=-1;
     let endInd = -1;
 
@@ -60,70 +34,70 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
     let endLat = 0,endLong =0;
 
     if(startInd==-1){
-        startInd = stationTypeA.findIndex((value)=>value.STATION_NAME==startStation.toUpperCase());
+        startInd = stationTypeA.findIndex((value)=>value.STATION_CODE==startStation.toUpperCase());
         if(startInd!=-1){
             startLat = stationTypeA[startInd].Latitude;
             startLong = stationTypeA[startInd].Longitude;
         }
     }
     if(endInd==-1){
-        endInd = stationTypeA.findIndex((value)=>value.STATION_NAME==endStation.toUpperCase());
+        endInd = stationTypeA.findIndex((value)=>value.STATION_CODE==endStation.toUpperCase());
         if(endInd!=-1){
             endLat = stationTypeA[endInd].Latitude;
             endLong = stationTypeA[endInd].Longitude;
         }
     }
     if(startInd==-1){
-        startInd = stationTypeA1.findIndex((value)=>value.STATION_NAME==startStation.toUpperCase());
+        startInd = stationTypeA1.findIndex((value)=>value.STATION_CODE==startStation.toUpperCase());
         if(startInd!=-1){
             startLat = stationTypeA1[startInd].Latitude;
             startLong = stationTypeA1[startInd].Longitude;
         }
     }
     if(endInd==-1){
-        endInd = stationTypeA1.findIndex((value)=>value.STATION_NAME==endStation.toUpperCase());
+        endInd = stationTypeA1.findIndex((value)=>value.STATION_CODE==endStation.toUpperCase());
         if(endInd!=-1){
             endLat = stationTypeA1[endInd].Latitude;
             endLong = stationTypeA1[endInd].Longitude;
         }
     }
     if(startInd==-1){
-        startInd = stationTypeB.findIndex((value)=>value.STATION_NAME==startStation.toUpperCase());
+        startInd = stationTypeB.findIndex((value)=>value.STATION_CODE==startStation.toUpperCase());
         if(startInd!=-1){
             startLat = stationTypeB[startInd].Latitude;
             startLong = stationTypeB[startInd].Longitude;
         }
     }
     if(endInd==-1){
-        endInd = stationTypeB.findIndex((value)=>value.STATION_NAME==endStation.toUpperCase());
+        endInd = stationTypeB.findIndex((value)=>value.STATION_CODE==endStation.toUpperCase());
         if(endInd!=-1){
             endLat = stationTypeB[endInd].Latitude;
             endLong = stationTypeB[endInd].Longitude;
         }
     }
     if(startInd==-1){
-        startInd = stationTypeC.findIndex((value)=>value.STATION_NAME==startStation.toUpperCase());
+        startInd = stationTypeC.findIndex((value)=>value.STATION_CODE==startStation.toUpperCase());
         if(startInd!=-1){
             startLat = stationTypeC[startInd].Latitude;
             startLong = stationTypeC[startInd].Longitude;
         }
     }
     if(endInd==-1){
-        endInd = stationTypeC.findIndex((value)=>value.STATION_NAME==endStation.toUpperCase());
+        endInd = stationTypeC.findIndex((value)=>value.STATION_CODE==endStation.toUpperCase());
         if(endInd!=-1){
             endLat = stationTypeC[endInd].Latitude;
             endLong = stationTypeC[endInd].Longitude;
         }
     }
     if(startInd==-1){
-        startInd = stationTypeD.findIndex((value)=>value.STATION_NAME==startStation.toUpperCase());
+        startInd = stationTypeD.findIndex((value)=>value.STATION_CODE==startStation.toUpperCase());
         if(startInd!=-1){
             startLat = stationTypeD[startInd].Latitude;
             startLong = stationTypeD[startInd].Longitude;
         }
     }
     if(endInd==-1){
-        endInd = stationTypeD.findIndex((value)=>value.STATION_NAME==endStation.toUpperCase());
+        endInd = stationTypeD.findIndex((value)=>value.STATION_CODE==endStation.toUpperCase());
         if(endInd!=-1){
             endLat = stationTypeD[endInd].Latitude;
             endLong = stationTypeD[endInd].Longitude;
@@ -135,7 +109,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
     // }
 
     const stationNearStartA = stationTypeA.find((data)=>{
-        if(data.STATION_NAME!=startStation.toUpperCase()){
+        if(data.STATION_CODE!=startStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((startLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((startLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((startLong*Math.PI)/180)))*6371;//in km
@@ -145,7 +119,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearStartA1 = stationTypeA1.find((data)=>{
-        if(data.STATION_NAME!=startStation.toUpperCase()){
+        if(data.STATION_CODE!=startStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((startLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((startLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((startLong*Math.PI)/180)))*6371;//in km
@@ -155,7 +129,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearStartB = stationTypeB.find((data)=>{
-        if(data.STATION_NAME!=startStation.toUpperCase()){
+        if(data.STATION_CODE!=startStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((startLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((startLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((startLong*Math.PI)/180)))*6371;//in km
@@ -165,7 +139,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearStartC = stationTypeC.find((data)=>{
-        if(data.STATION_NAME!=startStation.toUpperCase()){
+        if(data.STATION_CODE!=startStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((startLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((startLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((startLong*Math.PI)/180)))*6371;//in km
@@ -175,7 +149,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearStartD = stationTypeD.find((data)=>{
-        if(data.STATION_NAME!=startStation.toUpperCase()){
+        if(data.STATION_CODE!=startStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((startLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((startLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((startLong*Math.PI)/180)))*6371;//in km
@@ -185,7 +159,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearEndA = stationTypeA.find((data)=>{
-        if(data.STATION_NAME!=endStation.toUpperCase()){
+        if(data.STATION_CODE!=endStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((endLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((endLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((endLong*Math.PI)/180)))*6371;
@@ -195,7 +169,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearEndA1 = stationTypeA1.find((data)=>{
-        if(data.STATION_NAME!=endStation.toUpperCase()){
+        if(data.STATION_CODE!=endStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((endLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((endLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((endLong*Math.PI)/180)))*6371;
@@ -205,7 +179,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearEndB = stationTypeB.find((data)=>{
-        if(data.STATION_NAME!=endStation.toUpperCase()){
+        if(data.STATION_CODE!=endStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((endLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((endLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((endLong*Math.PI)/180)))*6371;
@@ -215,7 +189,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearEndC = stationTypeC.find((data)=>{
-        if(data.STATION_NAME!=endStation.toUpperCase()){
+        if(data.STATION_CODE!=endStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((endLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((endLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((endLong*Math.PI)/180)))*6371;
@@ -225,7 +199,7 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
         }
     });
     const stationNearEndD = stationTypeD.find((data)=>{
-        if(data.STATION_NAME!=endStation.toUpperCase()){
+        if(data.STATION_CODE!=endStation.toUpperCase()){
             const lat = data.Latitude;
             const long = data.Longitude;
             const distance = Math.acos(Math.sin((endLat*Math.PI)/180)*Math.sin((lat*Math.PI)/180)+Math.cos((endLat*Math.PI)/180)*Math.cos((lat*Math.PI)/180)*Math.cos(((long*Math.PI)/180)-((endLong*Math.PI)/180)))*6371;
@@ -246,34 +220,66 @@ router.get("/search_train" , isLoggedIn , wrapAsync(async (req,res) => {
     stationNearEnd.sort((a,b)=>{
         const d1 = Math.acos(Math.sin(endLat*Math.PI/180)*Math.sin(a.Latitude*Math.PI/180)+Math.cos(endLat*Math.PI/180)*Math.cos(a.Latitude*Math.PI/180)*Math.cos((a.Longitude*Math.PI/180)-(endLong*Math.PI/180)))*6371;
         const d2 = Math.acos(Math.sin(endLat*Math.PI/180)*Math.sin(b.Latitude*Math.PI/180)+Math.cos(endLat*Math.PI/180)*Math.cos(b.Latitude*Math.PI/180)*Math.cos((b.Longitude*Math.PI/180)-(endLong*Math.PI/180)))*6371;
+        
         return d1-d2;
     });
+    return [stationNearStart, stationNearEnd];
+}
+
+
+// train home route
+
+router.get("", isLoggedIn,  wrapAsync(async (req,res) => {
+    let station = stations;
+    res.render("./train/home.ejs" , {station})
+}))
+
+
+
+// search train route
+
+router.get("/search_train" , wrapAsync(async (req,res) => {
+    
+    const {query} = req;
+    const startStationCode = query.from;
+    const endStationCode = query.to;
+    const date = query.date;
 
     // train api call 
+    console.log(startStationCode + " " + endStationCode + " " + date);
 
     let trains = await Train.find();
     // let trains = await train_api_irctc_call(startStationCode, endStationCode, date);
-
-
-
-
-    res.status(200).send({"StationNearStart":stationNearStart,"StationNearEnd":stationNearEnd});
-
-    // console.log(stationNearStart);
-
-
-
-
-    // res.render("./train/search_train.ejs" , {trains}); 
+    //trains = [];
+    res.render("./train/search_train.ejs" , {trains, startStationCode, endStationCode, date}); 
 }))
+
+
+
+
+
+// alternating station routes 
+
+router.get("/alternating_stations" , wrapAsync(async (req,res) => {
+    let start = req.query.startStationCode;
+    let end = req.query.endStationCode;
+    let date = req.query.date;
+    let stations = alternating(start,end);
+    let stationNearStart = stations[0];
+    let stationNearEnd = stations[1];
+    console.log("alter" + date);
+    // res.status(200).send(stations);
+    res.render("./train/alternating_stations.ejs",  {stationNearStart, stationNearEnd, start, end , date});
+}))
+
 
 
 
 
 // train booking route post
 
-router.post("/booking" , (req,res) => {
-    let train = req.body.ob;
+router.get("/booking" ,  isLoggedIn , wrapasync(async (req,res) => {
+    let train = req.query.ob;
     console.log(train);
 
     let price = {
@@ -283,9 +289,8 @@ router.post("/booking" , (req,res) => {
         "SL" : 700,
         "3E" : 1300,
     }
-
     res.render("./train/booking.ejs", {train , price});
-})
+}))
 
 router.post("/book" , isLoggedIn, wrapAsync(async (req,res) => {
     let booking = new Booking(req.body.ob);
