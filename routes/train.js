@@ -248,8 +248,8 @@ router.get("/search_train" , wrapAsync(async (req,res) => {
     // train api call 
     console.log(startStationCode + " " + endStationCode + " " + date);
 
-    let trains = await Train.find();
-    // let trains = await train_api_irctc_call(startStationCode, endStationCode, date);
+    // let trains = await Train.find();
+    let trains = await train_api_irctc_call(startStationCode, endStationCode, date);
     //trains = [];
     res.render("./train/search_train.ejs" , {trains, startStationCode, endStationCode, date}); 
 }))
@@ -295,8 +295,10 @@ router.get("/booking" ,  isLoggedIn , wrapasync(async (req,res) => {
 router.post("/book" , isLoggedIn, wrapAsync(async (req,res) => {
     let booking = new Booking(req.body.ob);
     booking.owner = req.user._id;
+    let user = req.user;
     await booking.save();
-    res.redirect("/user/history");
+    req.flash("success" , "Ticket booked successfully")
+    res.render("./users/ticket.ejs" , {booking, user});
 }))
 
 

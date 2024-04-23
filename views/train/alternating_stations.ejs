@@ -52,8 +52,8 @@
                             <h5 class="card-title">From : <%= stationA.STATION_NAME %> <br> To : <%= stationB.STATION_NAME %></h5>
                             <br>
                             <form class="p-0 m-0" action="/train/search_train" method="get">
-                                <input type="text" name="from" value="<%= start %>">
-                                <input type="text" name="to" value="<%= end %>">
+                                <input type="text" name="from" value="<%= stationA.STATION_CODE %>">
+                                <input type="text" name="to" value="<%= stationB.STATION_CODE %>">
                                 <input type="date" name="date" value="<%= date %>">
                                 <button class="btn btn-outline-dark">Search Trains</button>
                             </form>
